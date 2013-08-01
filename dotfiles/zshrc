@@ -1,0 +1,252 @@
+################################################################################
+# zshrc - a sample zshrc file for you to start using zsh as quickly as possible
+# in as friendly of an environment as possible. That being said, you should not
+# drop this file into your home folder without looking through it. Certain
+# sections marked with ``EDIT ME!" should be modified to fit your system's
+# configuration.
+#
+# Keep in mind that this file is YOURS! If you find some behaviour of your shell
+# undesirable, it is your duty to change it.
+#
+# This file was originally created by Sam King <sam@samking.org>, and has been
+# extensively modified by Matthew Plant <rookie.mp@gmail.com>. 
+################################################################################
+
+# Customizing the prompt:
+#	The prompt is the most important thing for you to customize and become
+# comfortable with, as you will be seeing it more than anything else in your
+# shell. I have based mine off a default csh prompt that I saw once. You may not
+# like it as much as I do, and that's okay!
+#	See http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html for
+# details on prompt expansion.
+#	A brief overview of prompts:
+#	* PROMPT is PS1, the primary prompt string, which is printed before the
+#	  command is printed.
+#	* PS2 is printed when the shell needs more information. (Ie, if you type
+#	  an opening paren and enter without typing the close paren.)
+#	* PS3 is for select loops.
+#	* PS4 is for execution trace.
+
+PROMPT="$USERNAME@%U%m%u:%B%~%b> "
+
+# Zsh parameters and environmental variables:
+#	Parameters and environmental variables are variables that you can modify
+# to change the behavior of your shell. A few notes:
+#	* This only contains the params and environmental variables that should
+#	  NOT be used by non-interactive shells. Global environmental variables
+#	  should go in zshenv.
+#	* CAPITAL means that the parameter will store on value; lowercase means
+#	  that the parameter is an array.
+# 	See the man page for zshparam for full descriptions.
+
+# Directory Stack:
+DIRSTACKSIZE=40		# Max size fo the directory stack. Good for
+			# truncating dirstack when it might grow very large (ie,
+			# when auto_pushd is on).
+
+# History File:
+HISTFILE=~/.zsh-hisfile	# Save shell history into .zsh-histfile so we don't lose
+			# history (up arrow) when closing the shell.
+HISTSIZE=10000		# The number of lines to read from the history file at
+			# startup. The only reason to have this larger than
+			# SAVEHIST is as a buffer for saving duplicated history
+			# events.
+SAVEHIST=10000		# The number of lines to save to history at logout.
+
+# Hosts and users:
+#	The hosts variable is an array that contains all the hostnames that you
+# want to be able to use tab completion to complete. The users array is an
+# array that contains all the usernames that you want to be completed along with
+# the hostnames.
+#	These variables are not special, and are not looked up by zsh. Instead,
+# they are passed to the zstyle command later on.
+
+hosts=(myth.stanford.edu corn.stanford.edu xenon.stanford.edu \
+	codethechange.org samking.org practicalunix.org)
+
+users=(samking)	# EDIT ME!
+
+# Ignored:
+#	Certain files we want to ignore during tab completion, such as backup
+# files or object files that we don't really care about. We define those here in
+# the ignored variable. Like hosts and users, ignored is not special; we pass it
+# to zstyle later on.
+#	Note that these files are not ignored when put after the rm command.
+
+ignored=('*?.o' '*?.c~' '*?.old' '*?.pro')
+
+# Completions and such:
+#	The following lines were added by compinstall, and relate to
+# completions. They've been annotated as much as possible, but should probably
+# be left alone (unless, of course, you don't think so!). The completions they
+# provide are quite exceptional and highly recommended.
+
+zstyle ':completion:*' completer _expand _complete _ignored _match _correct \
+    _approximate _prefix
+zstyle ':completion:*' completions 1
+zstyle ':completion:*' glob 1
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' matcher-list '+' '+m:{[:lower:]}={[:upper:]}' \
+    '+m:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+r:|[._-]=* r:|=* l:|=*'
+zstyle ':completion:*' max-errors 3 numeric
+zstyle ':completion:*' menu select=long
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at \
+    %p%s
+zstyle ':completion:*' substitute 1
+
+# EDIT ME!
+# Before you use this file, remove the ``samking'' in the following line with 
+# your own username:
+zstyle :compinstall filename '/home/samking/.zshrc'
+
+# Insert all expansions for expand completer:
+zstyle ':completion:*:expand:*' tag-order all-expansions
+
+# Formatting and messages:
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+
+# Offer indexes before parameters in subscripts:
+zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+
+# See 'Hosts & users':
+zstyle '*' hosts $hosts
+zstyle '*' users $users
+
+# Filename suffixes to ignore during completion (except after the rm command).
+zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns $ignored
+
+# Don't load every tab-completion module at startup. Instead, mark them all as
+# autoloaded so taht when you need them, they'll get loaded.
+autoload -Uz compinit.
+
+# Allow tab completion for command line options:
+compinit
+
+# zshell options:
+#	Here we se and unset certain options provided by zshell. This allows to
+# further configure our shell. Some things to note:
+#	* setopt sets an option; unsetopt unsets an option.
+#	* Even for unsetopt, my comments refer to the option itself.
+#	* Setting many of these options are unnecessary since they are set/unset
+#	  by default. They are here for clarity.
+#	* Underscores are optional and ignored in zsh options. There are also
+#	  one-letter names fore some options.
+#	* Prepending an option with "no" is the same as unsetting it.
+#	* These are the options for interactive shells. Any options for both
+#	  interactive and non-interactive shells should go in zshenv.
+#	See the man page for zshoptions for full descriptions.
+
+# Changing Directories:
+unsetopt auto_cd	# Prevent zsh from cd-ing into a directory if a director
+			# is typed without 'cd'.
+setopt auto_pushd	# When cd, push the old directory onto the dir stack.
+setopt pushd_ignore_dups	# Don't push duplicate copies of a directory to
+				# the directory stack.
+
+# Completion:
+setopt auto_list	# When tab completion is ambiguous, list choices.
+setopt auto_menu	# When tab completion is ambiguous, use menu completion
+			# (fill in the next option when you press tab).
+setopt list_beep	# When tab completion is ambiguous, beep.
+unsetopt menu_complete	# When tab completion is ambiguous, zsh automatically
+			# fills in the first option.
+unsetopt list_ambiguous	# When there is an unambiguous prefix, insert that
+			# before inserting ambiguous stuff from the menu. The
+			# menu_complete option takes precedence over this.
+
+# Expansion and Globbing:
+setopt glob		# Expand stuff to generate filenames.
+setopt extended_glob	# Treat #, ~, and ^ as globbing patterns.
+setopt nomatch		# zsh gets mad when I glob patterns that don't exist.
+
+# History:
+setopt append_history	# Append to the history file.
+setopt hist_ignore_dups	# Don't add immediately repeated commands to history.
+setopt extended_history	# Add timestamps to history. For a rough idea of the
+			# extra disk spaces this uses, you'll use up an extra
+			# 15kB for running 1,000 commands. Your call.
+
+# Input/Output:
+setopt aliases		# Use aliases defined below.
+setopt correct		# Correct bad spelling of commands.
+unsetopt correct_all	# Correct bad spelling of all arguments on a line. This
+			# is unset because it is fairly common to have an
+			# argument that is similar to a file in the current
+			# directory (eg, sudo git would correct to .git).
+setopt print_exit_value	# Prints the exit value of a command when it's not 0
+			# (success); useful when writing shell scripts.
+
+# Job Control:
+setopt bg_nice		# Nice background jobs (run them with lower priority).
+setopt check_jobs	# Yell if you try to exit with jobs running.
+unsetopt notify		# Notify of background job status immediately.
+
+# Scripts and Functions:
+setopt octal_zeroes	# Output octal numbers starting with 0 instead of 8#.
+setopt c_bases		# Output hex numbers with 0x rather than 16#.
+setopt multios		# Allows redirection of multiple i/o streams; ie:
+			# echo "foo" > file1 > file2 | cat
+
+# Zle - ZSH Line Editor:
+setopt beep	# zsh will beep when it's mad.
+
+# Aliases and Functions:
+#	An alias replaces a command with a specified string. For example, if I
+# alias the command "dance" to "echo dancing!", then typing dance into the shell
+# will result in "dancing!" being printed to the console.
+#	Functions are user-defined commands that are written in zsh. 
+#	Because aliases and functions can often lead to misleading behavior, we
+# only provide a few to wet your palette.
+
+alias grep='grep --color'	# Colorize output.
+
+case `uname` in
+    Darwin)	# Mac
+	alias ls='ls -G'	# Macs use -G rather than --color=auto
+	;;
+    Linux)
+	alias ls='ls --color=auto'	# Colorize output.
+	;;
+esac
+
+# If command-not-found package is installed, use it:
+if [ -x /usr/lib/command-not-found -o -x /usr/share/command-not-found ]; then
+  function command_not_found_handler {
+    # check because c-n-f could've been removed in the meantime
+    if [ -x /usr/lib/command-not-found ]; then
+      /usr/bin/python /usr/lib/command-not-found -- $1
+      return $?
+    elif [ -x /usr/share/command-not-found ]; then
+      /usr/bin/python /usr/share/command-not-found -- $1
+      return $?
+    else
+      return 127
+    fi
+  }
+fi
+
+# Keybindings:
+#	Important notes on key bindings:
+#	* Check out the man page for zshzle for more information on key bindings
+#	  and on the zsh line editor.
+#	* bindkey -s in-string out-string
+#	  When you type in-string, the line editor gets out-string.
+#	* bindkey [-R] in-string command
+#	  When you type in-string, command is run. -R treats in-string as a
+#	  range.
+#	* The man page lists plenty of escape sequences that you can run.
+#	* You can use zle and vared for more advanced stuff. You can also
+#	  develop your own widgets that mess with the line editor.
+#	* ZKBD also provides some nice functionality to check out, see:
+#	  http://zshwiki.org/home/zle/bindkeys
+
+bindkey -e	# Sets the keymap to "emacs".
+# bindkey -v	# Vim insert keymap.
+# bindkey -a	# Vim command keymap.
+
+
